@@ -234,6 +234,15 @@ func (c *WebsocketStreamClient) WsCombinedDepthServe100Ms(symbols []string, hand
 	return wsCombinedDepthServe(endpoint, handler, errHandler)
 }
 
+func (c *WebsocketStreamClient) WsCombinedDepthServeLevel(symbolLevels map[string]string, handler WsDepthHandler, errHandler ErrHandler) (doneCh, stopCh chan struct{}, err error) {
+	endpoint := c.Endpoint
+	for s, l := range symbolLevels {
+		endpoint += fmt.Sprintf("%s@depth%s", strings.ToLower(s), l) + "/"
+	}
+	endpoint = endpoint[:len(endpoint)-1]
+	return wsCombinedDepthServe(endpoint, handler, errHandler)
+}
+
 func wsCombinedDepthServe(endpoint string, handler WsDepthHandler, errHandler ErrHandler) (doneCh, stopCh chan struct{}, err error) {
 	cfg := newWsConfig(endpoint)
 	wsHandler := func(message []byte) {
